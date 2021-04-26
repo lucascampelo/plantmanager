@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import {
     SafeAreaView,
@@ -9,8 +9,12 @@ import {
     KeyboardAvoidingView,
     TouchableWithoutFeedback,
     Platform,
-    Keyboard
+    Keyboard,
+    Alert
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+
 import { Button } from '../components/Button';
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
@@ -22,8 +26,23 @@ export function UserIdentification() {
 
     const navigation = useNavigation();
 
-    const handleSubmit = () => {
-        navigation.navigate('Confirmation')
+    const handleSubmit = async () => {
+        if (!name) {
+            return Alert.alert("Me diz como chamar você 😢")
+        }
+
+        try {
+            await AsyncStorage.setItem('@plantmanager:user', name);
+            navigation.navigate('Confirmation', {
+                title: 'Prontinho',
+                subtitle: 'Agora vamos começar a cuidar das suas plantinhas com muito cuidado.',
+                buttonTitle: 'Começar',
+                icon: 'smile',
+                nextScreen: 'PlantSelect'
+            })
+        } catch {
+            Alert.alert("Não foi possível salvar o seu nome. 😢")
+        }
     }
 
     const handleInputBlur = () => {
@@ -39,6 +58,15 @@ export function UserIdentification() {
         setIsFilled(!!value);
         setName(value);
     }
+
+    useEffect(() => {
+        async function loadName() {
+            const name = (await AsyncStorage.getItem('@plantmanager:user') || '');
+            setName(name)
+        }
+
+        loadName()
+    }, [])
 
     return (
         <SafeAreaView style={styles.container}>
@@ -62,6 +90,7 @@ export function UserIdentification() {
                                     styles.input,
                                     (isFocused || isFilled) && { borderColor: colors.green }
                                 ]}
+                                value={name}
                                 placeholder="Digite um nome"
                                 onBlur={handleInputBlur}
                                 onFocus={handleInputFocus}

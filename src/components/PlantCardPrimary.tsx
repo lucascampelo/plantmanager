@@ -13,7 +13,7 @@ interface PlantCardPrimaryProps extends RectButtonProps {
     }
 }
 
-export default function PlantCardPrimary({
+export function PlantCardPrimary({
     data,
     ...rest
 }: PlantCardPrimaryProps) {

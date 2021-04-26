@@ -9,7 +9,7 @@ interface EnvironmentButtonProps extends RectButtonProps {
     active?: boolean;
 }
 
-export default function EnvironmentButton({
+export function EnvironmentButton({
     title,
     active = false,
     ...rest
